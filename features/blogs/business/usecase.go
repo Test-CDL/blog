@@ -53,3 +53,8 @@ func (uc *blogUseCase) PutBlog(idBlog int, update blogs.Core) (row int, err erro
 	row, err = uc.blogData.UpdateBlog(idBlog, update)
 	return row, err
 }
+
+func (uc *blogUseCase) DeleteBlog(idBlog int) (row int, err error) {
+	row, err = uc.blogData.DeleteBlog(idBlog)
+	return row, err
+}

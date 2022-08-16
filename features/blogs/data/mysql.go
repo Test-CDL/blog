@@ -52,6 +52,14 @@ func (repo *mysqlBlogRepository) UpdateBlog(idBlog int, data blogs.Core) (int, e
 	return 1, nil
 }
 
+func (repo *mysqlBlogRepository) DeleteBlog(idBlog int) (int, error) {
+	result := repo.db.Where("id = ?", idBlog).Delete(&Blog{})
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return 1, nil
+}
+
 func (repo *mysqlBlogRepository) CountBlogData() (int, error) {
 	var count int64
 	result := repo.db.Model(&Blog{}).Count(&count)
