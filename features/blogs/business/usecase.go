@@ -45,3 +45,11 @@ func (uc *blogUseCase) PostBlog(input blogs.Core) (row int, err error) {
 	row, err = uc.blogData.CreateBlog(input)
 	return row, err
 }
+
+func (uc *blogUseCase) PutBlog(idBlog int, update blogs.Core) (row int, err error) {
+	if update.Title == "" || update.Body == "" || update.Slug == "" {
+		return -1, fmt.Errorf("all input must be filled")
+	}
+	row, err = uc.blogData.UpdateBlog(idBlog, update)
+	return row, err
+}

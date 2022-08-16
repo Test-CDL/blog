@@ -69,3 +69,28 @@ func (h *BlogHandler) CreateBlog(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, _helpers.ResponseSuccesNoData("Succes to insert blog"))
 }
+
+func (h *BlogHandler) UpdateBlog(c echo.Context) error {
+	idBlog := c.Param("id")
+	idBlogInt, errIdBlog := strconv.Atoi(idBlog)
+	if errIdBlog != nil {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("failed id blog not recognize"))
+	}
+
+	var dataBlog _requestBlog.Blog
+	errBind := c.Bind(&dataBlog)
+	if errBind != nil {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to bind data"))
+	}
+	result, err := h.blogBusiness.PutBlog(idBlogInt, _requestBlog.ToCore(dataBlog))
+	if result == -1 {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("all input must be filled"))
+	}
+	if result == 0 {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to update blog"))
+	}
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to update blog"))
+	}
+	return c.JSON(http.StatusOK, _helpers.ResponseSuccesNoData("success to update blog"))
+}
