@@ -16,6 +16,7 @@ type Business interface {
 	GetSingleBlog(idBlog int) (data Core, err error)
 	PostBlog(data Core) (row int, err error)
 	PutBlog(idBlog int, data Core) (row int, err error)
+	DeleteBlog(idBlog int) (row int, err error)
 }
 
 type Data interface {
@@ -23,5 +24,6 @@ type Data interface {
 	SelectSingleBlog(idBlog int) (data Core, err error)
 	CreateBlog(data Core) (row int, err error)
 	UpdateBlog(idBlog int, data Core) (row int, err error)
+	DeleteBlog(idBlog int) (row int, err error)
 	CountBlogData() (count int, err error)
 }

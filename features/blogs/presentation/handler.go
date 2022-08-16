@@ -94,3 +94,17 @@ func (h *BlogHandler) UpdateBlog(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, _helpers.ResponseSuccesNoData("success to update blog"))
 }
+
+func (h *BlogHandler) DeleteBlog(c echo.Context) error {
+	idBlog := c.Param("id")
+	idBlogInt, errIdBlog := strconv.Atoi(idBlog)
+	if errIdBlog != nil {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("failed id blog not recognize"))
+	}
+
+	_, err := h.blogBusiness.DeleteBlog(idBlogInt)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to delete blog"))
+	}
+	return c.JSON(http.StatusOK, _helpers.ResponseSuccesNoData("success to delete blog"))
+}
