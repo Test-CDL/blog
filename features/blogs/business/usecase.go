@@ -2,6 +2,7 @@ package business
 
 import (
 	"chrombit/features/blogs"
+	"fmt"
 )
 
 type blogUseCase struct {
@@ -35,4 +36,12 @@ func (uc *blogUseCase) GetAllBlogs(limit, offset int) (data []blogs.Core, totalP
 func (uc *blogUseCase) GetSingleBlog(idBlog int) (data blogs.Core, err error) {
 	data, err = uc.blogData.SelectSingleBlog(idBlog)
 	return data, err
+}
+
+func (uc *blogUseCase) PostBlog(input blogs.Core) (row int, err error) {
+	if input.Title == "" || input.Body == "" || input.Slug == "" {
+		return -1, fmt.Errorf("all input must be filled")
+	}
+	row, err = uc.blogData.CreateBlog(input)
+	return row, err
 }

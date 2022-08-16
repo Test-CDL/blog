@@ -34,6 +34,15 @@ func (repo *mysqlBlogRepository) SelectSingleBlog(idBlog int) (blogs.Core, error
 	return dataBlog.toCore(), nil
 }
 
+func (repo *mysqlBlogRepository) CreateBlog(input blogs.Core) (int, error) {
+	var Blog = fromCore(input)
+	result := repo.db.Create(&Blog)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return 1, nil
+}
+
 func (repo *mysqlBlogRepository) CountBlogData() (int, error) {
 	var count int64
 	result := repo.db.Model(&Blog{}).Count(&count)
