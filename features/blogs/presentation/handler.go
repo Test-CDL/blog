@@ -2,6 +2,7 @@ package presentation
 
 import (
 	"chrombit/features/blogs"
+	_requestBlog "chrombit/features/blogs/presentation/request"
 	_responseBlog "chrombit/features/blogs/presentation/response"
 	_helpers "chrombit/helpers"
 	"strconv"
@@ -47,4 +48,24 @@ func (h *BlogHandler) GetSingleBlog(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, _helpers.ResponseSuccesWithData("success to get data", _responseBlog.FromCore(result)))
+}
+
+func (h *BlogHandler) CreateBlog(c echo.Context) error {
+	var inputBlog _requestBlog.Blog
+	errBind := c.Bind(&inputBlog)
+	if errBind != nil {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to bind data"))
+	}
+	result, err := h.blogBusiness.PostBlog(_requestBlog.ToCore(inputBlog))
+	if result == -1 {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("all input must be filled"))
+	}
+	if result == 0 {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to create blog"))
+	}
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, _helpers.ResponseFailed("failed to create blog"))
+	}
+
+	return c.JSON(http.StatusOK, _helpers.ResponseSuccesNoData("Succes to insert blog"))
 }

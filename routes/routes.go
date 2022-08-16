@@ -18,5 +18,6 @@ func New(presenter factory.Presenter) *echo.Echo {
 
 	e.GET("api/v1/blogs", presenter.BlogPresenter.GetAllBlogs)
 	e.GET("api/v1/blogs/:id", presenter.BlogPresenter.GetSingleBlog)
+	e.POST("api/v1/blogs", presenter.BlogPresenter.CreateBlog)
 	return e
 }
