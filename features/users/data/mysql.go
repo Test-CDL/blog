@@ -39,11 +39,11 @@ func (repo *mysqlUserRepository) PostUser(input users.Core) (row int, err error)
 func (repo *mysqlUserRepository) AuthUser(userName string, password string) (data string, token string, e error) {
 	userData := User{}
 	repo.db.Where("user_name = ?", userName).First(&userData)
-	// bool1 := _bcrypt.CheckPasswordHash(password, userData.Password)
+	bool1 := _enciption.CheckPasswordHash(password, userData.Password)
 
-	// if !bool1 {
-	// 	return "", "", fmt.Errorf("error")
-	// }
+	if !bool1 {
+		return "", "", fmt.Errorf("error")
+	}
 
 	token, errToken := _middlewares.CreateToken(int(userData.ID))
 
