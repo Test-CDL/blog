@@ -5,6 +5,7 @@ import (
 	_requestBlog "chrombit/features/blogs/presentation/request"
 	_responseBlog "chrombit/features/blogs/presentation/response"
 	_helpers "chrombit/helpers"
+	"chrombit/middlewares"
 	"strconv"
 
 	"net/http"
@@ -51,6 +52,14 @@ func (h *BlogHandler) GetSingleBlog(c echo.Context) error {
 }
 
 func (h *BlogHandler) CreateBlog(c echo.Context) error {
+	idTok, errDel := middlewares.ValidateToken(c)
+	if errDel != nil {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("invalid token"))
+	}
+
+	if idTok == 0 {
+		return c.JSON(http.StatusUnauthorized, _helpers.ResponseFailed("unauthorized"))
+	}
 	var inputBlog _requestBlog.Blog
 	errBind := c.Bind(&inputBlog)
 	if errBind != nil {
@@ -71,6 +80,15 @@ func (h *BlogHandler) CreateBlog(c echo.Context) error {
 }
 
 func (h *BlogHandler) UpdateBlog(c echo.Context) error {
+	idTok, errDel := middlewares.ValidateToken(c)
+	if errDel != nil {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("invalid token"))
+	}
+
+	if idTok == 0 {
+		return c.JSON(http.StatusUnauthorized, _helpers.ResponseFailed("unauthorized"))
+	}
+
 	idBlog := c.Param("id")
 	idBlogInt, errIdBlog := strconv.Atoi(idBlog)
 	if errIdBlog != nil {
@@ -96,6 +114,15 @@ func (h *BlogHandler) UpdateBlog(c echo.Context) error {
 }
 
 func (h *BlogHandler) DeleteBlog(c echo.Context) error {
+	idTok, errDel := middlewares.ValidateToken(c)
+	if errDel != nil {
+		return c.JSON(http.StatusBadRequest, _helpers.ResponseFailed("invalid token"))
+	}
+
+	if idTok == 0 {
+		return c.JSON(http.StatusUnauthorized, _helpers.ResponseFailed("unauthorized"))
+	}
+
 	idBlog := c.Param("id")
 	idBlogInt, errIdBlog := strconv.Atoi(idBlog)
 	if errIdBlog != nil {
