@@ -1,55 +1,39 @@
 package middlewares
 
 import (
+	"chrombit/constant"
 	"fmt"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwtv4 "github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
+
+	"github.com/labstack/echo/v4/middleware"
 )
 
-type JWT struct {
-	key []byte
-}
-
-func NewJWT(key []byte) JWT {
-	return JWT{
-		key: key,
-	}
-}
-
-func (j JWT) Create(ttl time.Duration, content interface{}) (string, error) {
-	now := time.Now().UTC()
-
-	claims := make(jwt.MapClaims)
-	claims["dat"] = content             // Our custom data.
-	claims["exp"] = now.Add(ttl).Unix() // The expiration time after which the token must be disregarded.
-	claims["iat"] = now.Unix()          // The time at which the token was issued.
-	claims["nbf"] = now.Unix()          // The time before which the token must be disregarded.
-
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(j.key)
-	if err != nil {
-		return "", fmt.Errorf("create: %w", err)
-	}
-
-	return token, nil
-}
-
-func (j JWT) Validate(token string) (interface{}, error) {
-	tok, err := jwt.Parse(token, func(jwtToken *jwt.Token) (interface{}, error) {
-		if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected method: %s", jwtToken.Header["alg"])
-		}
-
-		return j.key, nil
+func JWTMiddleware() echo.MiddlewareFunc {
+	return middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningMethod: "HS256",
+		SigningKey:    []byte(constant.SECRET_JWT),
 	})
-	if err != nil {
-		return nil, fmt.Errorf("validate: %w", err)
-	}
+}
 
-	claims, ok := tok.Claims.(jwt.MapClaims)
-	if !ok || !tok.Valid {
-		return nil, fmt.Errorf("validate: invalid")
-	}
+func CreateToken(userId int) (string, error) {
+	claims := jwtv4.MapClaims{}
+	claims["authorized"] = true
+	claims["userId"] = userId
+	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //token expired after 1 hour
+	token := jwtv4.NewWithClaims(jwtv4.SigningMethodHS256, claims)
+	return token.SignedString([]byte(constant.SECRET_JWT))
+}
 
-	return claims["dat"], nil
+func ValidateToken(e echo.Context) (int, error) {
+
+	user := e.Get("user").(*jwtv4.Token)
+	if user.Valid {
+		claims := user.Claims.(jwtv4.MapClaims)
+		userId := claims["userId"].(float64)
+		return int(userId), nil
+	}
+	return 0, fmt.Errorf("token invalid")
 }

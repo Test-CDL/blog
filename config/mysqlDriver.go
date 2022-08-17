@@ -2,6 +2,7 @@ package config
 
 import (
 	_mBlogs "chrombit/features/blogs/data"
+	_mUsers "chrombit/features/users/data"
 	"fmt"
 	"os"
 
@@ -33,4 +34,5 @@ func InitDB() *gorm.DB {
 
 func InitMigrate(db *gorm.DB) {
 	db.AutoMigrate(&_mBlogs.Blog{})
+	db.AutoMigrate(&_mUsers.User{})
 }
